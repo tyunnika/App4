@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:mvvm="clr-namespace:MvvmHelpers;assembly=MvvmHelpers"
+             xmlns:model="clr-namespace:App4.Models"
+             xmlns:viewmodels="clr-namespace:App4.ViewModels"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:xct="http://xamarin.com/schemas/2020/toolkit"
+             x:Class="App4.Views.CardsEquipmentPage"
+             x:DataType="viewmodels:CardsEquipmentViewModel"
+             x:Name ="CardsPage">
+    
+    <ContentPage.BindingContext>
+        <viewmodels:CardsEquipmentViewModel/>
+
+    </ContentPage.BindingContext>
+    
+
+    
+    <ListView 
+             SelectedItem="{Binding SelectedCards, Mode=TwoWay}"
+              CachingStrategy="RecycleElement"
+              BackgroundColor="Transparent"
+              HasUnevenRows="True"
+              ItemsSource="{Binding CardsGroups}"
+              IsGroupingEnabled="True"
+              GroupDisplayBinding="{Binding Key}"
+              SeparatorVisibility="None"
+             IsPullToRefreshEnabled="True"
+              IsRefreshing="{Binding IsBusy, Mode=OneWay}"
+              RefreshCommand="{Binding RefreshCommand}">
+
+        <ListView.Behaviors>
+            <xct:EventToCommandBehavior
+                EventName="ItemSelected"
+                Command="{Binding SelectedCommand}"
+                EventArgsConverter="{StaticResource ItemSelectedEventToConverter}"
+                />
+            
+        </ListView.Behaviors>
+        
+        <ListView.ItemTemplate>
+            <DataTemplate x:DataType="model:Cards">
+                <ViewCell>
+                    <ViewCell.ContextActions>
+                        <MenuItem Text="Favorite" 
+                                  Command="{Binding 
+                            Source={x:Reference CardsPage},
+                            Path= BindingContext.FavoriteCommand}"
+                                  CommandParameter="{Binding .}"/>
+                        <MenuItem Text="Delete" IsDestructive="True"/>
+                        
+                    </ViewCell.ContextActions>
+                    <Grid Padding="10">
+                        <Frame CornerRadius="20"
+                               HasShadow="True">
+                            <StackLayout Orientation="Horizontal">
+                                <Image Source="{Binding Image}"
+                                       MinimumWidthRequest="66"/>
+                                <StackLayout>
+                                    <Label VerticalOptions="Center"
+                                          FontSize="Large"
+                                          Text="{Binding Name}"/>
+                                    <Label VerticalOptions="Center"
+                                           FontSize="Large"
+                                           Text="{Binding Group}"/>
+
+                                </StackLayout>
+                                <Button Text="Favorite"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:CardsEquipmentViewModel}},
+                                    Path=FavoriteCommand}"
+                                        CommandParameter="{Binding .}"/>
+                            </StackLayout>
+                        </Frame>
+                    </Grid>
+                </ViewCell>
+            </DataTemplate>
+        </ListView.ItemTemplate>
+        <ListView.GroupHeaderTemplate>
+            <DataTemplate x:DataType="{x:Null}">
+                <ViewCell>
+                    <StackLayout Padding="20,0">
+                        <Label Style="{StaticResource LabelMedium}" Text="{Binding Key}" />
+                    </StackLayout>
+                </ViewCell>
+            </DataTemplate>
+        </ListView.GroupHeaderTemplate>
+        <ListView.Header>
+            <StackLayout Orientation="Horizontal">
+                <Label
+                    Margin="20"
+                    HorizontalOptions="Center"
+                    Style="{StaticResource LabelLarge}"
+                    Text="Coffees of the World">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </StackLayout>
+        </ListView.Header>
+        <ListView.Footer>
+            <StackLayout HorizontalOptions="Center" Orientation="Horizontal">
+                <Button
+                    Command="{Binding LoadMoreCommand}"
+                    Style="{StaticResource ButtonOutline}"
+                    Text="Load More" />
+            </StackLayout>
+        </ListView.Footer>
+
+
+
+    </ListView>
+</ContentPage>
